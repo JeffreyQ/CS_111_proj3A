@@ -63,6 +63,9 @@ void free_block_entries()
 
 	int i = -1;
 	int power = 0;
+
+
+/*
 	while ( (i > rangeStart) && (i < rangeEnd)) {
 		int mask = ( 1 << power );
 		
@@ -71,7 +74,7 @@ void free_block_entries()
 		power++;
 		i++;
 	}
-
+*/
 
 }
 
