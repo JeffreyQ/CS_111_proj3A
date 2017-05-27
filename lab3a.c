@@ -56,6 +56,17 @@ void handleSuperBlock()
 
 }
 
+
+
+void debug_info()
+{
+	printf("1. SUPERBLOCK\n2. total number of blocks (decimal)\n3. total number of i-nodes (decimal)\n4. block size (in bytes, decimal)\n5. i-node size (in bytes, decimal)\n6. blocks per group (decimal)\n7. i-nodes per group (decimal)\n8. first non-reserved i-node (decimal)\n");
+
+	printf("\n\n1.GROUP\n2.group number (decimal, starting from zero)\n3.total number of blocks in this group (decimal)\n4.total number of i-nodes in this group (decimal)\n5.number of free blocks (decimal)\n6.number of free i-nodes (decimal)\n7.block number of free block bitmap for this group (decimal)\n8.block number of free i-node bitmap for this group (decimal)\n9.block number of first block of i-nodes in this group (decimal)\n\n");
+
+}
+
+
 int main(int agrc, char ** argv)
 {
 
@@ -64,7 +75,7 @@ int main(int agrc, char ** argv)
 	if (image_fd < 0) 
 		fprintf(stderr,"Could not open file: \n", strerror(errno));
 
-
+	debug_info();
  	handleSuperBlock();
 	handleTable(); 
 }
