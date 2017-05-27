@@ -12,7 +12,15 @@
 extern int errno; 
 int image_fd; 
 struct ext2_super_block superBlock; 
+struct ext2_group_desc groupTable;
 void handleSuperBlock(); 
+
+
+void handleTable()
+{
+	int size = pread(image_fd, &groupTable, , sizeof(groupTable), sizeof(superBlock) + 1024);
+
+}
 
 void handleSuperBlock()
 {
@@ -45,6 +53,7 @@ int main(int agrc, char ** argv)
 
 
  	handleSuperBlock();
+	handleTable() 
 }
 
 
