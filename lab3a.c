@@ -15,13 +15,13 @@ extern int errno;
 int main(int agrc, char ** argv)
 {
 
-	int fd = open(argv[1], O_WRONLY);
+	int fd = open(argv[1], O_RDONLY);
 
 	if (fd < 0) 
 		fprintf(stderr,"Could not open file: \n", strerror(errno));
 
 	
-	struct  ext2_super_block superBlock;
+	struct ext2_super_block superBlock;
 
 
 	int readSize = pread(fd, &superBlock , sizeof(superBlock) , 1024);  //read the size of the super block from the offset 1024.
