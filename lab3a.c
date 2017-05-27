@@ -56,7 +56,24 @@ void handleSuperBlock()
 
 }
 
+void free_block_entries()
+{
+	int rangeStart = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_block_bitmap;
+	int rangeEnd = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_inode_bitmap;
 
+	int i = -1;
+	int power = 0;
+	while ( (i > rangeStart) && (i < rangeEnd)) {
+		int mask = ( 1 << power );
+		
+		if (mask & 
+
+		power++;
+		i++;
+	}
+
+
+}
 
 void debug_info()
 {
