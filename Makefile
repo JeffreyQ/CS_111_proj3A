@@ -6,5 +6,5 @@ default:
 clean:
 	rm lab3a
 
-run:
+run: default
 	./lab3a EXT2_test.img

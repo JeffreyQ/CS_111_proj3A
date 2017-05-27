@@ -18,8 +18,21 @@ void handleSuperBlock();
 
 void handleTable()
 {
-	int size = pread(image_fd, &groupTable, , sizeof(groupTable), sizeof(superBlock) + 1024);
+	int size = pread(image_fd, &groupTable, sizeof(groupTable), sizeof(superBlock) + 1024);
 
+	if (size <= 0)
+		fprintf(stderr, "Read Failed: %s\n", strerror(errno));
+
+	int groupNum = 0;
+	int totalBlocks = superBlock.s_blocks_count;
+	int totalInodes = superBlock.s_inodes_count;
+	int freeBlocks = (int) groupTable.bg_free_blocks_count;
+	int freeInodes = (int) groupTable.bg_free_inodes_count;
+	int blockBitmap = (int) groupTable.bg_block_bitmap;
+	int inodeBitmap = (int) groupTable.bg_inode_bitmap;
+	int inodeFirstBlock = (int) groupTable.bg_inode_table; 
+
+	fprintf(stdout, "%s,%d,%d,%d,%d,%d,%d,%d,%d\n", "GROUP", groupNum, totalBlocks, totalInodes, freeBlocks, freeInodes, blockBitmap, inodeBitmap, inodeFirstBlock); 
 }
 
 void handleSuperBlock()
@@ -53,7 +66,7 @@ int main(int agrc, char ** argv)
 
 
  	handleSuperBlock();
-	handleTable() 
+	handleTable(); 
 }
 
 
