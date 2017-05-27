@@ -22,16 +22,8 @@ void handleSuperBlock()
         if(readSize <= 0)
                 fprintf(stderr,"Read Failed: \n", strerror(errno));
 
-	int numBlocks = (int) superBlock.s_blocks_count;
-	int numInodes = (int) superBlock.s_inodes_count;
-	int blockSize = 1024 << ( (int) superBlock.s_log_block_size );
-	int inodeSize = (int) superBlock.s_inode_size;
-	int blocksPerGroup = (int) superBlock.s_blocks_per_group;
-	int inodesPerGroup = (int) superBlock.s_inodes_per_group;
-	int firstInode = (int) superBlock.s_first_ino;
-
-	fprintf(stdout,"%s,%d,%d,%d,%d,%d,%d,%d\n", "SUPERBLOCK", numBlocks, numInodes, blockSize, inodeSize, blocksPerGroup, inodesPerGroup, firstInode);	
-
+	        fprintf(stdout,"%s,%d,%d,%d,%d,%d,%d,%d\n","SUPERBLOCK",(int) superBlock.s_blocks_count
+		, (int) superBlock.s_inodes_count, 0, 0, (int) superBlock.s_blocks_per_group, (int) superBlock.s_inodes_per_group, 0 );
 
 }
 
