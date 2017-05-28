@@ -7,13 +7,98 @@
 #include "ext2_fs.h"
 #include <errno.h> 
 #include <string.h>
-
+#include <time.h>
 
 extern int errno; 
 int image_fd; 
 struct ext2_super_block superBlock; 
 struct ext2_group_desc groupTable;
 void handleSuperBlock(); 
+
+
+void inode_summary()
+{
+		struct ext2_inode Inode;
+// Get the range at start of block 
+
+  		int rangeStart = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_inode_table;
+		int rangeEnd = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * (groupTable.bg_inode_table + 1);
+
+// Get range at the end of block
+
+		
+		int count = 0;
+		int inodeNumber; 
+		char *fileType = malloc(1); 
+		int mode; 		
+		int owner;
+		int group;
+		int linkCount;
+        char accessBuff[30];
+		char creationBuff[30];
+		char modifiedBuff[30];
+		int fileSize; 
+		int numBlocks; 
+
+	/*
+	for each inode check the mode is not 0 and that the links are not 0 
+	if they are not, then increment count but dont generate CSV. Else 
+	go to CSV generation process.
+	*/
+
+		for(int i = rangeStart; i < rangeEnd; i+= sizeof(Inode))
+		{
+		
+					int size = pread(image_fd, &Inode, sizeof(Inode), i); 
+					count++; 
+					
+					time_t	accessTime = Inode.i_atime;
+					time_t	creationTime = Inode.i_ctime; 
+					time_t 	modifiedTime = Inode.i_mtime;
+					
+					struct tm* accessStruct = localtime(&accessTime);
+					struct tm* creationStruct = localtime(&creationTime); 
+					struct tm* modifiedStruct = localtime(&modifiedTime); 
+								
+
+					strftime(&accessBuff[0], 30, "%m/%d/%g %H:%M:%S", accessStruct);
+					strftime(&creationBuff[0], 30, "%m/%d/%g %H:%M:%S", creationStruct);
+					strftime(&modifiedBuff[0], 30, "%m/%d/%g %H:%M:%S", modifiedStruct);
+
+					fileSize = (int) Inode.i_size;
+					numBlocks = (int) Inode.i_blocks;
+					group = (int) Inode.i_gid; 
+					linkCount = (int) Inode.i_links_count;
+					mode = (int) (Inode.i_mode & 511);
+					owner = (int) Inode.i_uid;
+
+					if(Inode.i_mode != 0 && Inode.i_links_count != 0) 
+					{
+
+							inodeNumber = count;
+
+							if((Inode.i_mode & 0x4000) == 0x4000)
+									fileType = "d";
+							else 
+									if((Inode.i_mode & 0xA000) == 0xA000)
+										fileType = "s";
+							else
+									if((Inode.i_mode & 0x8000) == 0x8000)
+										fileType = "f";	
+							else 
+									fileType = "?";
+
+						
+						fprintf(stdout, "%s,%d,%s,%o,%d,%d,%d,%s,%s,%s,%d,%d\n","INODE", inodeNumber,fileType, 
+						mode, owner,group, linkCount,accessBuff,creationBuff, modifiedBuff,	fileSize, numBlocks); 
+						
+					}	
+				
+
+		}
+
+	
+}
 
 
 void free_inode_entries()
@@ -66,10 +151,7 @@ void free_block_entries()
 					count++;
 
                     if((mask & byte) == 0)
-                    {
                             fprintf(stdout, "%s,%d\n", "BFREE", count);
-                    }
-
             }
     }
 
@@ -139,6 +221,8 @@ int main(int agrc, char ** argv)
 	handleTable(); 
 	free_block_entries();
 	free_inode_entries();
+	inode_summary();
+
 }
 
 
