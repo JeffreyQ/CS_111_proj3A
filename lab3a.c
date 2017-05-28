@@ -345,7 +345,7 @@ void summarize_inodes()
 				for(int j = 0; j < 12; j++) 
 				{
 
-                    if(Inode.i_block[j] == 0)
+					if(Inode.i_block[j] == 0)
 						break;											                         
 																				
 					int dirStart = Inode.i_block[j]*1024;	
@@ -360,7 +360,8 @@ void summarize_inodes()
 							if(dirEntry.inode != 0) 
 							{
 								//char *Name = dirEntry.name[EXT2_NAME_LEN];
-								printf("%s,%d,%d,%s,\n","DIRENT", inodeNumber, k, &dirEntry.name[0]);
+								int offset = k - dirStart;
+								printf("%s,%d,%d,%d,%d,%d,\'%s\',\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);
 								
 							}
 							
