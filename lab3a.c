@@ -15,6 +15,38 @@ struct ext2_super_block superBlock;
 struct ext2_group_desc groupTable;
 void handleSuperBlock(); 
 
+
+void free_inode_entries()
+{
+
+	int count = 0;
+    int rangeStart = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_inode_bitmap;
+	int rangeEnd = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_inode_table; 
+
+    for( int i = rangeStart; i < rangeEnd; i++)
+    {
+            char byte;
+			int size = pread(image_fd, &byte, sizeof(byte) , i);
+
+            for( int j = 0; j < 8; j ++)
+            {
+                    int mask = ( 1 << j );
+					count++;
+
+                    if((mask & byte) == 0)
+                    {
+                            fprintf(stdout, "%s,%d\n", "IFREE", count);
+                    }
+
+            }
+    }
+
+}
+
+
+
+
+
 void free_block_entries()
 {
 
@@ -41,22 +73,9 @@ void free_block_entries()
             }
     }
 
-
-/*
-    int i = -1;
-    int power = 0;
-    while ( (i > rangeStart) && (i < rangeEnd)) {
-        int mask = ( 1 << power );
-
-        if (mask &
-
-        power++;
-        i++;
-    }
-*/
-
-//	printf("%d", count); 
 }
+
+
 
 void handleTable()
 {
@@ -119,7 +138,7 @@ int main(int agrc, char ** argv)
  	handleSuperBlock();
 	handleTable(); 
 	free_block_entries();
-
+	free_inode_entries();
 }
 
 

@@ -8,3 +8,6 @@ clean:
 
 run: default
 	./lab3a EXT2_test.img
+
+run_test: default 
+	./lab3a trivial.img
