@@ -244,10 +244,10 @@ void summarize_inodes()
 	if they are not, then increment count but dont generate CSV. Else 
 	go to CSV generation process.
 	*/
-	for(int i = rangeStart; i < rangeEnd; i+= sizeof(Inode)) {
+	for(int i = rangeStart; i < rangeEnd; i += sizeof(Inode)) {
 	
 		int size = pread(image_fd, &Inode, sizeof(Inode), i); 
-					count++; 
+		count++; 
 									
 		time_t	accessTime = Inode.i_atime;
 		time_t	creationTime = Inode.i_ctime; 
