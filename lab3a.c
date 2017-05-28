@@ -55,7 +55,7 @@ void free_block_entries()
     }
 */
 
-	printf("%d", count); 
+//	printf("%d", count); 
 }
 
 void handleTable()
