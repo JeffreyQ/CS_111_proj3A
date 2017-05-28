@@ -33,7 +33,7 @@ void inode_summary()
 		int owner;
 		int group;
 		int linkCount;
-        char accessBuff[30];
+		char accessBuff[30];
 		char creationBuff[30];
 		char modifiedBuff[30];
 		int fileSize; 
@@ -94,6 +94,15 @@ void inode_summary()
 						,Inode.i_block[5] ,Inode.i_block[6] ,Inode.i_block[7] ,Inode.i_block[8] ,Inode.i_block[9] 
 						,Inode.i_block[10] ,Inode.i_block[11] ,Inode.i_block[12] ,Inode.i_block[13] ,Inode.i_block[14] ); 
 						
+						struct ext2_dir_entry dirEntry;
+
+						if(fileType[0] == 'd')
+						{
+							for(int j = 0; j < 12; j++) 
+							{
+									;  //Start Working here.  
+							}
+						}
 
 					}	
 				
@@ -202,6 +211,7 @@ void handleSuperBlock()
 
 }
 
+
 void debug_info()
 {
 	printf("1. SUPERBLOCK\n2. total number of blocks (decimal)\n3. total number of i-nodes (decimal)\n4. block size (in bytes, decimal)\n5. i-node size (in bytes, decimal)\n6. blocks per group (decimal)\n7. i-nodes per group (decimal)\n8. first non-reserved i-node (decimal)\n");
@@ -219,7 +229,7 @@ int main(int agrc, char ** argv)
 	if (image_fd < 0) 
 		fprintf(stderr,"Could not open file: \n", strerror(errno));
 
-	debug_info();
+//	debug_info();
  	handleSuperBlock();
 	handleTable(); 
 	free_block_entries();
