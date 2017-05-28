@@ -22,12 +22,11 @@ void inode_summary()
 // Get the range at start of block 
 
   		int rangeStart = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_inode_table;
-		int rangeEnd = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * (groupTable.bg_inode_table + 1);
+		int rangeEnd = rangeStart + (superBlock.s_inodes_count * sizeof(Inode)); 
+		
 
 // Get range at the end of block
-
-		
-		int count = 0;
+		int count = 0;	
 		int inodeNumber; 
 		char *fileType = malloc(1); 
 		int mode; 		
@@ -101,7 +100,7 @@ void inode_summary()
 
 		}
 
-	
+//  printf("%d\n",sizeof(Inode));	
 }
 
 
