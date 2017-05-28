@@ -55,8 +55,10 @@ void summarize_superblock()
 
         int readSize = pread(image_fd, &superBlock , sizeof(superBlock) , 1024);  //read the size of the super block from the offset 1024.
 
-        if(readSize <= 0)
-                fprintf(stderr,"Read Failed: \n", strerror(errno));
+        if(readSize <= 0) {
+                fprintf(stderr,"Read Failed: %s\n", strerror(errno));
+		exit(2);
+	}
 
 	int numBlocks = (int) superBlock.s_blocks_count;
 	int numInodes = (int) superBlock.s_inodes_count;
@@ -67,8 +69,6 @@ void summarize_superblock()
 	int firstInode = (int) superBlock.s_first_ino;
 
 	fprintf(stdout,"%s,%d,%d,%d,%d,%d,%d,%d\n", "SUPERBLOCK", numBlocks, numInodes, blockSize, inodeSize, blocksPerGroup, inodesPerGroup, firstInode);	
-
-
 }
 
 
@@ -98,8 +98,10 @@ void summarize_groups()
 {
 	int size = pread(image_fd, &groupTable, sizeof(groupTable), sizeof(superBlock) + 1024);
 
-	if (size <= 0)
+	if (size <= 0) {
 		fprintf(stderr, "Read Failed: %s\n", strerror(errno));
+		exit(2);
+	}
 
 	int groupNum = 0;
 	int totalBlocks = superBlock.s_blocks_count;
@@ -333,8 +335,10 @@ int main(int agrc, char ** argv)
 
 	image_fd = open(argv[1], O_RDONLY);
 
-	if (image_fd < 0) 
-		fprintf(stderr,"Could not open file: \n", strerror(errno));
+	if (image_fd < 0) {
+		fprintf(stderr,"Could not open file: %s\n", strerror(errno));
+		exit(2);
+	}
 
 //	debug_info();
  	summarize_superblock();
@@ -343,4 +347,5 @@ int main(int agrc, char ** argv)
 	summarize_free_inodes();
 	summarize_inodes();
 
+	return 0;
 }
