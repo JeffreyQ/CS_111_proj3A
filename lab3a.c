@@ -23,12 +23,59 @@ struct ext2_group_desc groupTable;
 
 
 /* Function Prototypes */
+void debug_info();
 void summarize_superblock();
 void summarize_groups(); 
 void summarize_free_blocks();
 void summarize_free_inodes();
 void summarize_inodes();
 
+
+
+
+
+
+/* 
+ * print out required fields from assignment specifications
+ */
+void debug_info()
+{
+	printf("1. SUPERBLOCK\n2. total number of blocks (decimal)\n3. total number of i-nodes (decimal) \
+		\n4. block size (in bytes, decimal)\n5. i-node size (in bytes, decimal)\n6. blocks per group (decimal) \
+		\n7. i-nodes per group (decimal)\n8. first non-reserved i-node (decimal)\n");
+
+	printf("\n\n1.GROUP\n2.group number (decimal, starting from zero)\n3.total number of blocks in this group (decimal) \
+		\n4.total number of i-nodes in this group (decimal)\n5.number of free blocks (decimal) \
+		\n6.number of free i-nodes (decimal)\n7.block number of free block bitmap for this group (decimal) \
+		\n8.block number of free i-node bitmap for this group (decimal) \
+		\n9.block number of first block of i-nodes in this group (decimal)\n\n");
+}
+
+
+
+
+
+
+
+int main(int agrc, char ** argv)
+{
+
+	image_fd = open(argv[1], O_RDONLY);
+
+	if (image_fd < 0) {
+		fprintf(stderr,"Could not open file: %s\n", strerror(errno));
+		exit(2);
+	}
+
+//	debug_info();
+ 	summarize_superblock();
+	summarize_groups(); 
+	summarize_free_blocks();
+	summarize_free_inodes();
+	summarize_inodes();
+
+	return 0;
+}
 
 
 
@@ -228,6 +275,7 @@ void summarize_inodes()
 	// Get range at the end of block
 	int rangeEnd = rangeStart + (superBlock.s_inodes_count * sizeof(Inode)); 
 
+
 	int count = 0;	
 	int inodeNumber; 
 	char *fileType = malloc(1); 
@@ -293,9 +341,32 @@ void summarize_inodes()
 						
 			if(fileType[0] == 'd') {
 				struct ext2_dir_entry dirEntry;
+						
+				for(int j = 0; j < 12; j++) 
+				{
+
+                    if(Inode.i_block[j] == 0)
+						break;											                         
+																				
+					int dirStart = Inode.i_block[j]*1024;	
+					
+					for(int k = dirStart; k < (dirStart + 1024); k+=sizeof(dirEntry))
+					{
+							int dirSize = pread(image_fd,&dirEntry,sizeof(dirEntry),k);
 							
-				for(int j = 0; j < 12; j++) {
-					;  //Start Working here.
+							if(dirSize < 0) 
+									printf("Fail\n");
+						
+							if(dirEntry.inode != 0) 
+							{
+								//char *Name = dirEntry.name[EXT2_NAME_LEN];
+								printf("%s,%d,%d,%s,\n","DIRENT", inodeNumber, k, &dirEntry.name[0]);
+								
+							}
+							
+
+					}
+					//Start Working here.
 				}
 			}
 
@@ -303,49 +374,3 @@ void summarize_inodes()
 	}
 }
 
-
-
-
-
-
-/* 
- * print out required fields from assignment specifications
- */
-void debug_info()
-{
-	printf("1. SUPERBLOCK\n2. total number of blocks (decimal)\n3. total number of i-nodes (decimal) \
-		\n4. block size (in bytes, decimal)\n5. i-node size (in bytes, decimal)\n6. blocks per group (decimal) \
-		\n7. i-nodes per group (decimal)\n8. first non-reserved i-node (decimal)\n");
-
-	printf("\n\n1.GROUP\n2.group number (decimal, starting from zero)\n3.total number of blocks in this group (decimal) \
-		\n4.total number of i-nodes in this group (decimal)\n5.number of free blocks (decimal) \
-		\n6.number of free i-nodes (decimal)\n7.block number of free block bitmap for this group (decimal) \
-		\n8.block number of free i-node bitmap for this group (decimal) \
-		\n9.block number of first block of i-nodes in this group (decimal)\n\n");
-}
-
-
-
-
-
-
-
-int main(int agrc, char ** argv)
-{
-
-	image_fd = open(argv[1], O_RDONLY);
-
-	if (image_fd < 0) {
-		fprintf(stderr,"Could not open file: %s\n", strerror(errno));
-		exit(2);
-	}
-
-//	debug_info();
- 	summarize_superblock();
-	summarize_groups(); 
-	summarize_free_blocks();
-	summarize_free_inodes();
-	summarize_inodes();
-
-	return 0;
-}
