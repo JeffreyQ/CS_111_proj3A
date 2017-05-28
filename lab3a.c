@@ -51,7 +51,7 @@ void inode_summary()
 		
 					int size = pread(image_fd, &Inode, sizeof(Inode), i); 
 					count++; 
-					
+									
 					time_t	accessTime = Inode.i_atime;
 					time_t	creationTime = Inode.i_ctime; 
 					time_t 	modifiedTime = Inode.i_mtime;
@@ -89,9 +89,13 @@ void inode_summary()
 									fileType = "?";
 
 						
-						fprintf(stdout, "%s,%d,%s,%o,%d,%d,%d,%s,%s,%s,%d,%d\n","INODE", inodeNumber,fileType, 
-						mode, owner,group, linkCount,accessBuff,creationBuff, modifiedBuff,	fileSize, numBlocks); 
+						fprintf(stdout, "%s,%d,%s,%o,%d,%d,%d,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n","INODE", inodeNumber,fileType, 
+						mode, owner,group, linkCount,accessBuff,creationBuff, modifiedBuff,	fileSize, numBlocks
+						,Inode.i_block[0] ,Inode.i_block[1] ,Inode.i_block[2] ,Inode.i_block[3] ,Inode.i_block[4] 
+						,Inode.i_block[5] ,Inode.i_block[6] ,Inode.i_block[7] ,Inode.i_block[8] ,Inode.i_block[9] 
+						,Inode.i_block[10] ,Inode.i_block[11] ,Inode.i_block[12] ,Inode.i_block[13] ,Inode.i_block[14] ); 
 						
+
 					}	
 				
 
