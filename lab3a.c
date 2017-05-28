@@ -15,6 +15,48 @@ struct ext2_super_block superBlock;
 struct ext2_group_desc groupTable;
 void handleSuperBlock(); 
 
+void free_block_entries()
+{
+
+	int count = 0;
+    int rangeStart = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_block_bitmap;
+    int rangeEnd = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_inode_bitmap;
+
+
+    for( int i = rangeStart; i < rangeEnd; i++)
+    {
+            char byte;
+			int size = pread(image_fd, &byte, sizeof(byte) , i);
+
+            for( int j = 0; j < 8; j ++)
+            {
+                    int mask = ( 1 << j );
+					count++;
+
+                    if((mask & byte) == 0)
+                    {
+                            fprintf(stdout, "%s,%d\n", "BFREE", count);
+                    }
+
+            }
+    }
+
+
+/*
+    int i = -1;
+    int power = 0;
+    while ( (i > rangeStart) && (i < rangeEnd)) {
+        int mask = ( 1 << power );
+
+        if (mask &
+
+        power++;
+        i++;
+    }
+*/
+
+	printf("%d", count); 
+}
 
 void handleTable()
 {
@@ -56,28 +98,6 @@ void handleSuperBlock()
 
 }
 
-void free_block_entries()
-{
-	int rangeStart = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_block_bitmap;
-	int rangeEnd = ( 1024 << ( (int) superBlock.s_log_block_size ) ) * groupTable.bg_inode_bitmap;
-
-	int i = -1;
-	int power = 0;
-
-
-/*
-	while ( (i > rangeStart) && (i < rangeEnd)) {
-		int mask = ( 1 << power );
-		
-		if (mask & 
-
-		power++;
-		i++;
-	}
-*/
-
-}
-
 void debug_info()
 {
 	printf("1. SUPERBLOCK\n2. total number of blocks (decimal)\n3. total number of i-nodes (decimal)\n4. block size (in bytes, decimal)\n5. i-node size (in bytes, decimal)\n6. blocks per group (decimal)\n7. i-nodes per group (decimal)\n8. first non-reserved i-node (decimal)\n");
@@ -98,6 +118,8 @@ int main(int agrc, char ** argv)
 	debug_info();
  	handleSuperBlock();
 	handleTable(); 
+	free_block_entries();
+
 }
 
 
