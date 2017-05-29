@@ -359,11 +359,12 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 	for(int j = 0; j < 12; j++) {
 		if(Inode.i_block[j] == 0)
 				return;
-																				
+
 		processInode(Inode.i_block[j],inodeNumber); 
 
 	}
-	level_one_indir(13, inodeNumber);
+
+	level_one_indir(Inode.i_block[12], inodeNumber);
 }
 
 
@@ -390,6 +391,9 @@ void processInode(int blockNumber, int inodeNumber)
 
 void level_one_indir(int blockNumber, int inodeNumber)
 {
+	if(blockNumber <= 0) 
+			return; 
+
 	int dirStart = blockNumber * 1024;
 	int block_id;	
 
