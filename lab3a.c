@@ -406,7 +406,6 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 	if(blockNumber <= 0) 	
 		return; 
 
-
 	int dirStart = blockNumber * 1024;
 	int block_id;	
 
@@ -422,7 +421,7 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 			return; 
 		
 		if(index == 13) { 
-			process_indirect_block(block_id, inodeNumber, -1);
+			process_indirect_block(block_id, inodeNumber, 12);
 		}
 		else if(index == 14) {
 			process_indirect_block(block_id, inodeNumber, 13);
