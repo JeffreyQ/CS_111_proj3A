@@ -57,8 +57,12 @@ void debug_info()
 
 
 
-int main(int agrc, char ** argv)
+int main(int argc, char ** argv)
 {
+	if (argc != 2) {
+		fprintf(stderr, "usage\t./lab3a EXT2Image.fs\n");
+		exit(1);
+	}
 
 	image_fd = open(argv[1], O_RDONLY);
 
