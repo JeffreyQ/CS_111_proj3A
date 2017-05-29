@@ -31,8 +31,7 @@ void summarize_free_inodes();
 void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
 void processInode(int blockNumber, int inodeNumber);
-void level_one_indir(int, int);
-
+void level_one_indir(int blockNumber, int inodeNumber, int index);
 
 
 
@@ -364,7 +363,9 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 
 	}
 
-	level_one_indir(Inode.i_block[12], inodeNumber);
+	level_one_indir(Inode.i_block[12], inodeNumber, 12);
+	level_one_indir(Inode.i_block[13], inodeNumber, 13);
+	level_one_indir(Inode.i_block[14], inodeNumber, 14);
 }
 
 
@@ -393,12 +394,11 @@ void processInode(int blockNumber, int inodeNumber)
 
 
 
-void level_one_indir(int blockNumber, int inodeNumber)
+void level_one_indir(int blockNumber, int inodeNumber, int index)
 {
 	if(blockNumber <= 0) 
 			return; 
 
-	printf("%dHITHIT\n", blockNumber); 
 
 	int dirStart = blockNumber * 1024;
 	int block_id;	
@@ -406,15 +406,28 @@ void level_one_indir(int blockNumber, int inodeNumber)
 	for (int k = dirStart; k < (dirStart + 1024); k += 4) {
 		int blockRead = pread(image_fd, &block_id, sizeof(block_id), k);		
 		if(blockRead < 0) 
-			{
-					printf("bad read\n");
-			}
+		{
+			printf("bad read\n");
+		}
 		
 		if(block_id == 0) 
 				return; 
+		
+		if(index == 13)
+		{ 
+			level_one_indir(block_id, inodeNumber, -1);
+			continue; 
+		}
+
+		if(index == 14) 
+		{
+			level_one_indir(block_id, inodeNumber, 13);
+			continue; 
+		}
 
 		processInode(block_id, inodeNumber);
 	}
 
-
 }
+
+
