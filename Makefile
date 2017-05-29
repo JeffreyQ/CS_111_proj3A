@@ -1,4 +1,3 @@
-#.SILENT:
 
 default: 
 	gcc -g -std=gnu99 lab3a.c -o lab3a

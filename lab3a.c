@@ -350,22 +350,19 @@ void summarize_inodes()
 																				
 					int dirStart = Inode.i_block[j]*1024;	
 					
-					for(int k = dirStart; k < (dirStart + 1024); k+=sizeof(dirEntry))
+					for(int k = dirStart; k < (dirStart + 1024); k+=dirEntry.rec_len)
 					{
-							int dirSize = pread(image_fd,&dirEntry,sizeof(dirEntry),k);
+						int dirSize = pread(image_fd, &dirEntry, sizeof(dirEntry), k);
 							
-							if(dirSize < 0) 
-									printf("Fail\n");
+						if(dirSize < 0) 
+							printf("Fail\n");
 						
-							if(dirEntry.inode != 0) 
-							{
-								//char *Name = dirEntry.name[EXT2_NAME_LEN];
-								int offset = k - dirStart;
-								printf("%s,%d,%d,%d,%d,%d,\'%s\',\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);
-								
-							}
-							
-
+						if(dirEntry.inode != 0) 
+						{
+							//char *Name = dirEntry.name[EXT2_NAME_LEN];
+							int offset = k - dirStart;
+							printf("%s,%d,%d,%d,%d,%d,\'%s\',\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);		
+						}	
 					}
 					//Start Working here.
 				}
