@@ -411,25 +411,24 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 		int blockRead = pread(image_fd, &block_id, sizeof(block_id), k);		
 		if(blockRead < 0) 
 		{
-			printf("bad read\n");
+			fprintf(stderr, "Bad read\n");
+			exit(2);
 		}
 		
 		if(block_id == 0) 
-				return; 
+			return; 
 		
-		if(index == 13)
-		{ 
+		if(index == 13) { 
 			process_indirect_block(block_id, inodeNumber, -1);
-			continue; 
+			// continue; 
 		}
-
-		if(index == 14) 
-		{
+		else if(index == 14) {
 			process_indirect_block(block_id, inodeNumber, 13);
-			continue; 
+			// continue; 
 		}
-
-		processInode(block_id, inodeNumber);
+		else {
+			processInode(block_id, inodeNumber);
+		}
 	}
 
 }
