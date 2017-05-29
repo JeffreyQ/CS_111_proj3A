@@ -370,6 +370,10 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 
 void processInode(int blockNumber, int inodeNumber)
 {
+
+		if(blockNumber == 0) 
+				return;
+
 		struct ext2_dir_entry dirEntry;
 
 		int dirStart = blockNumber*1024;	
@@ -394,11 +398,21 @@ void level_one_indir(int blockNumber, int inodeNumber)
 	if(blockNumber <= 0) 
 			return; 
 
+	printf("%dHITHIT\n", blockNumber); 
+
 	int dirStart = blockNumber * 1024;
 	int block_id;	
 
 	for (int k = dirStart; k < (dirStart + 1024); k += 4) {
-		pread(image_fd, &block_id, sizeof(block_id), k);
+		int blockRead = pread(image_fd, &block_id, sizeof(block_id), k);		
+		if(blockRead < 0) 
+			{
+					printf("bad read\n");
+			}
+		
+		if(block_id == 0) 
+				return; 
+
 		processInode(block_id, inodeNumber);
 	}
 
