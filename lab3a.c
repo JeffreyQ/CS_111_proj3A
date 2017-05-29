@@ -32,7 +32,7 @@ void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
 void processInode(int, int);
 void process_indirect_block(int, int, int);
-void summarize_indirect_blocks(const struct ext2_inode, int)
+void summarize_indirect_blocks(const struct ext2_inode, int);
 
 
 
@@ -347,7 +347,7 @@ void summarize_inodes()
 			if(fileType[0] == 'd') {
 				summarize_dir_blocks(Inode, inodeNumber);
 			}
-
+			summarize_indirect_blocks(Inode, inodeNumber);
 		}	
 	}
 }
@@ -392,7 +392,7 @@ void processInode(int blockNumber, int inodeNumber)
 						
 			if(dirEntry.inode != 0) {
 				int offset = k - dirStart;
-				printf("%s,%d,%d,%d,%d,%d,'%s',\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);		
+				printf("%s,%d,%d,%d,%d,%d,'%s'\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);		
 			}	
 		}
 }
@@ -428,7 +428,11 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 			// continue; 
 		}
 		else {
-			processInode(block_id, inodeNumber);
+			// processInode(block_id, inodeNumber);
+			if (block_id == 0)
+				return;
+			int offsetStart = block_id * 1024;
+			fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", "INDIRECT", inodeNumber, (index - 11), offsetStart, ((k - 1024) / 4 + 1), block_id); 
 		}
 	}
 
