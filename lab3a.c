@@ -19,8 +19,8 @@ extern int errno;
 int image_fd; 
 struct ext2_super_block superBlock; 
 struct ext2_group_desc groupTable;
-
-
+int * offsetArray;
+int freeInodes; 
 
 /* Function Prototypes */
 void debug_info();
@@ -32,7 +32,7 @@ void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
 void processInode(int, int);
 void process_indirect_block(int, int, int);
-void summarize_indirect_blocks(const struct ext2_inode, int)
+void summarize_indirect_blocks(const struct ext2_inode, int);
 
 
 
@@ -74,10 +74,17 @@ int main(int argc, char ** argv)
 
 //	debug_info();
  	summarize_superblock();
+	freeInodes = superBlock.s_inodes_count - superBlock.s_free_inodes_count; 
+	offsetArray = malloc(sizeof(int)*freeInodes);
 	summarize_groups(); 
 	summarize_free_blocks();
 	summarize_free_inodes();
 	summarize_inodes();
+
+	for(int i=0; i < freeInodes; i++)
+	{
+		printf("%d\n", offsetArray[i]);
+	}
 
 	return 0;
 }
@@ -279,7 +286,7 @@ void summarize_inodes()
 
 	// Get range at the end of block
 	int rangeEnd = rangeStart + (superBlock.s_inodes_count * sizeof(Inode)); 
-
+	int offsetCount = 0;
 
 	int count = 0;	
 	int inodeNumber; 
@@ -327,6 +334,8 @@ void summarize_inodes()
 			owner = (int) Inode.i_uid;
 
 			inodeNumber = count;
+			offsetArray[offsetCount] = inodeNumber;
+			offsetCount++;
 
 			if((Inode.i_mode & 0x4000) == 0x4000)
 				fileType = "d";
