@@ -30,8 +30,9 @@ void summarize_free_blocks();
 void summarize_free_inodes();
 void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
-void processInode(int blockNumber, int inodeNumber);
-void process_indirect_block(int blockNumber, int inodeNumber, int index);
+void processInode(int, int);
+void process_indirect_block(int, int, int);
+void summarize_indirect_blocks(const struct ext2_inode, int)
 
 
 
@@ -303,27 +304,27 @@ void summarize_inodes()
 		int size = pread(image_fd, &Inode, sizeof(Inode), i); 
 		count++; 
 									
-		time_t	accessTime = Inode.i_atime;
-		time_t	creationTime = Inode.i_ctime; 
-		time_t 	modifiedTime = Inode.i_mtime;
-					
-		struct tm* accessStruct = localtime(&accessTime);
-		struct tm* creationStruct = localtime(&creationTime); 
-		struct tm* modifiedStruct = localtime(&modifiedTime); 
-								
-
-		strftime(&accessBuff[0], 30, "%m/%d/%g %H:%M:%S", accessStruct);
-		strftime(&creationBuff[0], 30, "%m/%d/%g %H:%M:%S", creationStruct);
-		strftime(&modifiedBuff[0], 30, "%m/%d/%g %H:%M:%S", modifiedStruct);
-
-		fileSize = (int) Inode.i_size;
-		numBlocks = (int) Inode.i_blocks;
-		group = (int) Inode.i_gid; 
-		linkCount = (int) Inode.i_links_count;
-		mode = (int) (Inode.i_mode & 511);
-		owner = (int) Inode.i_uid;
-
 		if(Inode.i_mode != 0 && Inode.i_links_count != 0) {
+
+			time_t	accessTime = Inode.i_atime;
+			time_t	creationTime = Inode.i_ctime; 
+			time_t 	modifiedTime = Inode.i_mtime;
+						
+			struct tm* accessStruct = localtime(&accessTime);
+			struct tm* creationStruct = localtime(&creationTime); 
+			struct tm* modifiedStruct = localtime(&modifiedTime); 
+									
+	
+			strftime(&accessBuff[0], 30, "%m/%d/%g %H:%M:%S", accessStruct);
+			strftime(&creationBuff[0], 30, "%m/%d/%g %H:%M:%S", creationStruct);
+			strftime(&modifiedBuff[0], 30, "%m/%d/%g %H:%M:%S", modifiedStruct);
+	
+			fileSize = (int) Inode.i_size;
+			numBlocks = (int) Inode.i_blocks;
+			group = (int) Inode.i_gid; 
+			linkCount = (int) Inode.i_links_count;
+			mode = (int) (Inode.i_mode & 511);
+			owner = (int) Inode.i_uid;
 
 			inodeNumber = count;
 
@@ -356,6 +357,8 @@ void summarize_inodes()
 
 
 
+
+
 void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 {
 
@@ -367,9 +370,7 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 
 	}
 
-	process_indirect_block(Inode.i_block[12], inodeNumber, 12);
-	process_indirect_block(Inode.i_block[13], inodeNumber, 13);
-	process_indirect_block(Inode.i_block[14], inodeNumber, 14);
+	summarize_indirect_blocks(Inode, inodeNumber);
 }
 
 
@@ -400,8 +401,8 @@ void processInode(int blockNumber, int inodeNumber)
 
 void process_indirect_block(int blockNumber, int inodeNumber, int index)
 {
-	if(blockNumber <= 0) 
-			return; 
+	if(blockNumber <= 0) 	
+		return; 
 
 
 	int dirStart = blockNumber * 1024;
@@ -434,3 +435,15 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 }
 
 
+
+
+
+
+void summarize_indirect_blocks(const struct ext2_inode Inode, int inodeNumber)
+{
+	process_indirect_block(Inode.i_block[12], inodeNumber, 12);
+	process_indirect_block(Inode.i_block[13], inodeNumber, 13);
+	process_indirect_block(Inode.i_block[14], inodeNumber, 14);
+
+
+}
