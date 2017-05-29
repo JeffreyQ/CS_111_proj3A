@@ -30,8 +30,7 @@ void summarize_free_blocks();
 void summarize_free_inodes();
 void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
-
-
+void processInode(int blockNumber, int inodeNumber);
 
 
 
@@ -355,13 +354,23 @@ void summarize_inodes()
 
 void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 {
-	struct ext2_dir_entry dirEntry;
-			
+
 	for(int j = 0; j < 12; j++) {
 		if(Inode.i_block[j] == 0)
-			break;											                         
+				return;
 																				
-		int dirStart = Inode.i_block[j]*1024;	
+	processInode(Inode.i_block[j],inodeNumber); 
+
+
+	}
+}
+
+
+void processInode(int blockNumber, int inodeNumber)
+{
+		struct ext2_dir_entry dirEntry;
+
+		int dirStart = blockNumber*1024;	
 					
 		for(int k = dirStart; k < (dirStart + 1024); k+=dirEntry.rec_len) {
 			int dirSize = pread(image_fd, &dirEntry, sizeof(dirEntry), k);
@@ -371,8 +380,7 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 						
 			if(dirEntry.inode != 0) {
 				int offset = k - dirStart;
-				printf("%s,%d,%d,%d,%d,%d,\'%s\',\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);		
+				printf("%s,%d,%d,%d,%d,%d,'%s',\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);		
 			}	
 		}
-	}
 }
