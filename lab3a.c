@@ -31,7 +31,7 @@ void summarize_free_inodes();
 void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
 void processInode(int blockNumber, int inodeNumber);
-void level_one_indir(int blockNumber, int inodeNumber, int index);
+void process_indirect_block(int blockNumber, int inodeNumber, int index);
 
 
 
@@ -367,9 +367,9 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 
 	}
 
-	level_one_indir(Inode.i_block[12], inodeNumber, 12);
-	level_one_indir(Inode.i_block[13], inodeNumber, 13);
-	level_one_indir(Inode.i_block[14], inodeNumber, 14);
+	process_indirect_block(Inode.i_block[12], inodeNumber, 12);
+	process_indirect_block(Inode.i_block[13], inodeNumber, 13);
+	process_indirect_block(Inode.i_block[14], inodeNumber, 14);
 }
 
 
@@ -398,7 +398,7 @@ void processInode(int blockNumber, int inodeNumber)
 
 
 
-void level_one_indir(int blockNumber, int inodeNumber, int index)
+void process_indirect_block(int blockNumber, int inodeNumber, int index)
 {
 	if(blockNumber <= 0) 
 			return; 
@@ -419,13 +419,13 @@ void level_one_indir(int blockNumber, int inodeNumber, int index)
 		
 		if(index == 13)
 		{ 
-			level_one_indir(block_id, inodeNumber, -1);
+			process_indirect_block(block_id, inodeNumber, -1);
 			continue; 
 		}
 
 		if(index == 14) 
 		{
-			level_one_indir(block_id, inodeNumber, 13);
+			process_indirect_block(block_id, inodeNumber, 13);
 			continue; 
 		}
 
