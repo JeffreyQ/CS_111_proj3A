@@ -31,7 +31,7 @@ void summarize_free_inodes();
 void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
 void processInode(int blockNumber, int inodeNumber);
-void level_one_indir();
+void level_one_indir(int, int);
 
 
 
@@ -363,6 +363,7 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 		processInode(Inode.i_block[j],inodeNumber); 
 
 	}
+	level_one_indir(13, inodeNumber);
 }
 
 
