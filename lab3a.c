@@ -364,7 +364,7 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 
 	for(int j = 0; j < 12; j++) {
 		if(Inode.i_block[j] == 0)
-				return;
+			return;
 
 		processInode(Inode.i_block[j],inodeNumber); 
 
@@ -378,7 +378,7 @@ void processInode(int blockNumber, int inodeNumber)
 {
 
 		if(blockNumber == 0) 
-				return;
+			return;
 
 		struct ext2_dir_entry dirEntry;
 
@@ -387,10 +387,12 @@ void processInode(int blockNumber, int inodeNumber)
 		for(int k = dirStart; k < (dirStart + 1024); k+=dirEntry.rec_len) {
 			int dirSize = pread(image_fd, &dirEntry, sizeof(dirEntry), k);
 							
-			if(dirSize < 0) 
-				printf("Fail\n");
-						
-			if(dirEntry.inode != 0) {
+			if (dirSize < 0) {
+				printf("Directory entry unable to be read.\n");
+				exit(2);
+			}
+			
+			if (dirEntry.inode != 0) {
 				int offset = k - dirStart;
 				printf("%s,%d,%d,%d,%d,%d,'%s'\n","DIRENT", inodeNumber, offset, dirEntry.inode, dirEntry.rec_len, dirEntry.name_len, &dirEntry.name[0]);		
 			}	
@@ -421,18 +423,17 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 		
 		if(index == 13) { 
 			process_indirect_block(block_id, inodeNumber, -1);
-			// continue; 
 		}
 		else if(index == 14) {
 			process_indirect_block(block_id, inodeNumber, 13);
-			// continue; 
 		}
 		else {
-			// processInode(block_id, inodeNumber);
 			if (block_id == 0)
 				return;
+
+			int indir_block_num = ((k - 1024) / 4 + 1);
 			int offsetStart = block_id * 1024;
-			fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", "INDIRECT", inodeNumber, (index - 11), offsetStart, ((k - 1024) / 4 + 1), block_id); 
+			fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", "INDIRECT", inodeNumber, (index - 11), offsetStart, indir_block_num, block_id); 
 		}
 	}
 
@@ -448,6 +449,4 @@ void summarize_indirect_blocks(const struct ext2_inode Inode, int inodeNumber)
 	process_indirect_block(Inode.i_block[12], inodeNumber, 12);
 	process_indirect_block(Inode.i_block[13], inodeNumber, 13);
 	process_indirect_block(Inode.i_block[14], inodeNumber, 14);
-
-
 }
