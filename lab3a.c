@@ -19,6 +19,7 @@ extern int errno;
 int image_fd; 
 struct ext2_super_block superBlock; 
 struct ext2_group_desc groupTable;
+int bOffset = 11;
 
 
 
@@ -311,13 +312,12 @@ void summarize_inodes()
 			time_t 	modifiedTime = Inode.i_mtime;
 						
 			struct tm* accessStruct = localtime(&accessTime);
-			struct tm* creationStruct = localtime(&creationTime); 
-			struct tm* modifiedStruct = localtime(&modifiedTime); 
-									
-	
 			strftime(&accessBuff[0], 30, "%m/%d/%g %H:%M:%S", accessStruct);
+			struct tm* creationStruct = localtime(&creationTime); 
 			strftime(&creationBuff[0], 30, "%m/%d/%g %H:%M:%S", creationStruct);
+			struct tm* modifiedStruct = localtime(&modifiedTime); 
 			strftime(&modifiedBuff[0], 30, "%m/%d/%g %H:%M:%S", modifiedStruct);
+	
 	
 			fileSize = (int) Inode.i_size;
 			numBlocks = (int) Inode.i_blocks;
@@ -339,7 +339,7 @@ void summarize_inodes()
 
 						
 			fprintf(stdout, "%s,%d,%s,%o,%d,%d,%d,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n","INODE", inodeNumber,fileType, 
-				mode, owner,group, linkCount,accessBuff,creationBuff, modifiedBuff,	fileSize, numBlocks
+				mode, owner,group, linkCount,creationBuff,modifiedBuff, accessBuff,	fileSize, numBlocks
 				,Inode.i_block[0] ,Inode.i_block[1] ,Inode.i_block[2] ,Inode.i_block[3] ,Inode.i_block[4] 
 				,Inode.i_block[5] ,Inode.i_block[6] ,Inode.i_block[7] ,Inode.i_block[8] ,Inode.i_block[9] 
 				,Inode.i_block[10] ,Inode.i_block[11] ,Inode.i_block[12] ,Inode.i_block[13] ,Inode.i_block[14] ); 
@@ -408,13 +408,17 @@ void processInode(int blockNumber, int inodeNumber)
 
 void process_indirect_block(int blockNumber, int inodeNumber, int index, char *file_type)
 {
+
+
 	if(blockNumber <= 0) 	
 		return; 
 
 	int dirStart = blockNumber * 1024;
-	int block_id;	
 
 	for (int k = dirStart; k < (dirStart + 1024); k += 4) {
+		
+		int block_id; 
+
 		int blockRead = pread(image_fd, &block_id, sizeof(block_id), k);		
 		if(blockRead < 0) 
 		{
@@ -424,6 +428,7 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 		
 		if(block_id == 0) 
 			return; 
+
 		
 		if(index == 13) { 
 			process_indirect_block(block_id, inodeNumber, 12, file_type);
@@ -437,9 +442,9 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 		}
 
             if (!strcmp(file_type, "INDIRECT")) {
-                int indir_block_num = ((k - 1024) / 4 + 1);
-                int offsetStart = block_id * 1024;
-                fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, (index - 11), offsetStart, indir_block_num, block_id);
+				int offset = index - 11;
+				bOffset++;
+                fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, offset , bOffset, blockNumber, block_id);
             }
 
 	}

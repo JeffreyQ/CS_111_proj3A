@@ -2,8 +2,8 @@
 default: 
 	gcc -g -std=gnu99 lab3a.c -o lab3a
 
-clean: dist
-	rm lab3a lab3a-504646937.tar.gz
+clean: 
+	rm -rf lab3a lab3a-504646937.tar.gz
 
 run: default
 	./lab3a EXT2_test.img
