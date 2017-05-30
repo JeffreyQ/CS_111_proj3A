@@ -31,8 +31,8 @@ void summarize_free_inodes();
 void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
 void processInode(int, int);
-void process_indirect_block(int, int, int);
-void summarize_indirect_blocks(const struct ext2_inode, int);
+void process_indirect_block(int, int, int, char *);
+void summarize_indirect_blocks(const struct ext2_inode, int, char *);
 
 
 
@@ -347,7 +347,7 @@ void summarize_inodes()
 			if(fileType[0] == 'd') {
 				summarize_dir_blocks(Inode, inodeNumber);
 			}
-			summarize_indirect_blocks(Inode, inodeNumber);
+			summarize_indirect_blocks(Inode, inodeNumber, "INDIRECT");
 		}	
 	}
 }
@@ -370,7 +370,8 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 
 	}
 
-	summarize_indirect_blocks(Inode, inodeNumber);
+	// summarize_indirect_blocks(Inode, inodeNumber);
+	summarize_indirect_blocks(Inode, inodeNumber, "DIRENT");
 }
 
 
@@ -401,7 +402,7 @@ void processInode(int blockNumber, int inodeNumber)
 
 
 
-void process_indirect_block(int blockNumber, int inodeNumber, int index)
+void process_indirect_block(int blockNumber, int inodeNumber, int index, char *file_type)
 {
 	if(blockNumber <= 0) 	
 		return; 
@@ -421,10 +422,10 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 			return; 
 		
 		if(index == 13) { 
-			process_indirect_block(block_id, inodeNumber, 12);
+			process_indirect_block(block_id, inodeNumber, 12, file_type);
 		}
 		else if(index == 14) {
-			process_indirect_block(block_id, inodeNumber, 13);
+			process_indirect_block(block_id, inodeNumber, 13, file_type);
 		}
 		else {
 			if (block_id == 0)
@@ -432,7 +433,7 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 
 			int indir_block_num = ((k - 1024) / 4 + 1);
 			int offsetStart = block_id * 1024;
-			fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", "INDIRECT", inodeNumber, (index - 11), offsetStart, indir_block_num, block_id); 
+			fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, (index - 11), offsetStart, indir_block_num, block_id); 
 		}
 	}
 
@@ -443,9 +444,9 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index)
 
 
 
-void summarize_indirect_blocks(const struct ext2_inode Inode, int inodeNumber)
+void summarize_indirect_blocks(const struct ext2_inode Inode, int inodeNumber, char *file_type)
 {
-	process_indirect_block(Inode.i_block[12], inodeNumber, 12);
-	process_indirect_block(Inode.i_block[13], inodeNumber, 13);
-	process_indirect_block(Inode.i_block[14], inodeNumber, 14);
+	process_indirect_block(Inode.i_block[12], inodeNumber, 12, file_type);
+	process_indirect_block(Inode.i_block[13], inodeNumber, 13, file_type);
+	process_indirect_block(Inode.i_block[14], inodeNumber, 14, file_type);
 }
