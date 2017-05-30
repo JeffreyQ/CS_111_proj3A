@@ -375,6 +375,10 @@ void summarize_dir_blocks(const struct ext2_inode Inode, int inodeNumber)
 }
 
 
+
+
+
+
 void processInode(int blockNumber, int inodeNumber)
 {
 
@@ -430,10 +434,14 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 		else {
 			if (block_id == 0)
 				return;
-
-			int indir_block_num = ((k - 1024) / 4 + 1);
-			int offsetStart = block_id * 1024;
-			fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, (index - 11), offsetStart, indir_block_num, block_id); 
+			if (file_type == "INDIRECT") {
+				int indir_block_num = ((k - 1024) / 4 + 1);
+				int offsetStart = block_id * 1024;
+				fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, (index - 11), offsetStart, indir_block_num, block_id); 
+			}
+			else if (file_type == "DIRENT") {
+				processInode(blockNumber, inodeNumber);
+			}
 		}
 	}
 
