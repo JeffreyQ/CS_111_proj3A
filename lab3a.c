@@ -440,7 +440,7 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 				fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, (index - 11), offsetStart, indir_block_num, block_id); 
 			}
 			else if (file_type == "DIRENT") {
-				processInode(blockNumber, inodeNumber);
+				processInode(block_id, inodeNumber);
 			}
 		}
 	}
