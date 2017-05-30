@@ -1,0 +1,15 @@
+NAME: 	Udayan Sahai
+	Jeffrey Qiu
+ID:	(Udayan) 504646937
+	(Jeffrey) 804808179
+EMAIL:	Udasahai@gmail.com  
+	jeffreyyqiu@gmail.com
+
+
+List of included files:
+ 1. lab3a.c : A C program that explores an EXT2 file system image in user mode.
+
+ 2. Makefile : To build and run the deliverable program.
+
+ 3. README : To describe the project and its relevant files.
+
