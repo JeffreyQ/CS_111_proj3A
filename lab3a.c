@@ -431,18 +431,17 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 		else if(index == 14) {
 			process_indirect_block(block_id, inodeNumber, 13, file_type);
 		}
-		else {
-			if (block_id == 0)
-				return;
-			if (!strcmp(file_type, "INDIRECT")) {
-				int indir_block_num = ((k - 1024) / 4 + 1);
-				int offsetStart = block_id * 1024;
-				fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, (index - 11), offsetStart, indir_block_num, block_id); 
-			}
-			else if (!strcmp(file_type, "DIRENT")) {
+		else 
+			if (!strcmp(file_type, "DIRENT")) {
 				processInode(block_id, inodeNumber);
-			}
 		}
+
+            if (!strcmp(file_type, "INDIRECT")) {
+                int indir_block_num = ((k - 1024) / 4 + 1);
+                int offsetStart = block_id * 1024;
+                fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, (index - 11), offsetStart, indir_block_num, block_id);
+            }
+
 	}
 
 }
