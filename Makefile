@@ -1,4 +1,4 @@
-
+.SILENT:
 default: 
 	gcc -g -std=gnu99 lab3a.c -o lab3a
 
@@ -12,4 +12,4 @@ run_test: default
 	./lab3a trivial.img
 
 dist: default 
-	tar -zvcf lab3a-504646937.tar.gz Makefile README lab3a.c EXT2_test.img ext2_fs.h 
+	tar -zvcf lab3a-504646937.tar.gz Makefile README lab3a.c ext2_fs.h 
