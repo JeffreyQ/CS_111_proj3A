@@ -19,7 +19,6 @@ extern int errno;
 int image_fd; 
 struct ext2_super_block superBlock; 
 struct ext2_group_desc groupTable;
-int bOffset = 11;
 
 
 
@@ -311,11 +310,11 @@ void summarize_inodes()
 			time_t	creationTime = Inode.i_ctime; 
 			time_t 	modifiedTime = Inode.i_mtime;
 						
-			struct tm* accessStruct = localtime(&accessTime);
+			struct tm* accessStruct = gmtime(&accessTime);
 			strftime(&accessBuff[0], 30, "%m/%d/%g %H:%M:%S", accessStruct);
-			struct tm* creationStruct = localtime(&creationTime); 
+			struct tm* creationStruct = gmtime(&creationTime); 
 			strftime(&creationBuff[0], 30, "%m/%d/%g %H:%M:%S", creationStruct);
-			struct tm* modifiedStruct = localtime(&modifiedTime); 
+			struct tm* modifiedStruct = gmtime(&modifiedTime); 
 			strftime(&modifiedBuff[0], 30, "%m/%d/%g %H:%M:%S", modifiedStruct);
 	
 	
@@ -445,7 +444,6 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 
             if (!strcmp(file_type, "INDIRECT")) {
 				int offset = index - 11;
-				bOffset++;
 			
 			if(level == 1) 
 					fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, offset , counter + blockOffset , blockNumber, block_id);
