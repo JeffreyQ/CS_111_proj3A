@@ -31,7 +31,7 @@ void summarize_free_inodes();
 void summarize_inodes();
 void summarize_dir_blocks(const struct ext2_inode, int);
 void processInode(int, int);
-void process_indirect_block(int, int, int, char *, int, int);
+void process_indirect_block(int, int, char *, int, int);
 void summarize_indirect_blocks(const struct ext2_inode, int, char *);
 
 
@@ -405,7 +405,7 @@ void processInode(int blockNumber, int inodeNumber)
 
 
 
-void process_indirect_block(int blockNumber, int inodeNumber, int index, char *file_type, int blockOffset, int level)
+void process_indirect_block(int blockNumber, int inodeNumber, char *file_type, int blockOffset, int level)
 {
 
 
@@ -431,11 +431,11 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 			return; 
 
 		
-		if(index == 13) { 
-			process_indirect_block(block_id, inodeNumber, 12, file_type, blockOffset , 1);
+		if(level == 2) { 
+			process_indirect_block(block_id, inodeNumber, file_type, blockOffset , 1);
 		}
-		else if(index == 14) {
-			process_indirect_block(block_id, inodeNumber, 13, file_type, blockOffset, 2);
+		else if(level == 3) {
+			process_indirect_block(block_id, inodeNumber, file_type, blockOffset, 2);
 		}
 		else 
 			if (!strcmp(file_type, "DIRENT")) {
@@ -443,7 +443,7 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 		}
 
             if (!strcmp(file_type, "INDIRECT")) {
-				int offset = index - 11;
+				int offset = level;
 			
 			if(level == 1) 
 					fprintf(stdout, "%s,%d,%d,%d,%d,%d\n", file_type, inodeNumber, offset , counter + blockOffset , blockNumber, block_id);
@@ -468,7 +468,7 @@ void process_indirect_block(int blockNumber, int inodeNumber, int index, char *f
 
 void summarize_indirect_blocks(const struct ext2_inode Inode, int inodeNumber, char *file_type)
 {
-	process_indirect_block(Inode.i_block[12], inodeNumber, 12, file_type, 12, 1);
-	process_indirect_block(Inode.i_block[13], inodeNumber, 13, file_type, 12+256,2);
-	process_indirect_block(Inode.i_block[14], inodeNumber, 14, file_type, 12+256+(256*256), 3);
+	process_indirect_block(Inode.i_block[12], inodeNumber, file_type, 12, 1);
+	process_indirect_block(Inode.i_block[13], inodeNumber, file_type, 12+256,2);
+	process_indirect_block(Inode.i_block[14], inodeNumber, file_type, 12+256+(256*256), 3);
 }
